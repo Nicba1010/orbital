@@ -23,28 +23,14 @@ install:
     rm libzip5_1.5.1-0ubuntu1_amd64.deb
     rm libzip-dev_1.5.1-0ubuntu1_amd64.deb
 - ps: |
-    set MSYSTEM=MINGW64
-    C:\msys64\usr\bin\pacman --noconfirm -Syyu
-    C:\msys64\usr\bin\pacman --needed --noconfirm -S git python2
-    C:\msys64\usr\bin\pacman --needed --noconfirm -S mingw-w64-x86_64-toolchain base-devel
-    C:\msys64\usr\bin\pacman --needed --noconfirm -S mingw-w64-x86_64-glib2 mingw-w64-x86_64-gtk3
-    C:\msys64\usr\bin\pacman --needed --noconfirm -S mingw-w64-x86_64-vulkan mingw-w64-x86_64-SDL2
-    C:\msys64\usr\bin\pacman --needed --noconfirm -S mingw-w64-x86_64-glslang mingw-w64-x86_64-libzip
-    C:\msys64\usr\bin\pacman --needed --noconfirm -S mingw-w64-x86_64-libusb openssl-devel
+    PowerShell -Command 'Set-ExecutionPolicy -ExecutionPolicy RemoteSigned'
+    PowerShell -File ci_msys_prepare.ps1 'C:\tools\msys64'
+    
 before_build:
-- ps: |
-    set MSYSTEM=MINGW64
-    C:\msys64\usr\bin\bash -lc 'if [ -f /usr/bin/python ]; then mv /usr/bin/python /usr/bin/python.bak; fi; ln -s /usr/bin/python2 /usr/bin/python'
-    C:\msys64\usr\bin\bash -lc 'mv /mingw64/bin/envsubst.exe /mingw64/bin/envsubst.exe.bak; ln -s /usr/bin/envsubst.exe /mingw64/bin/envsubst.exe'
-    C:\msys64\usr\bin\bash -lc 'echo ''export PATH=/mingw64/bin:$PATH'' >> ~/.bash_profile'
-    C:\msys64\usr\bin\bash -lc 'echo ''CPPFLAGS=-I/mingw64/include'' >> ~/.bash_profile'
-    C:\msys64\usr\bin\bash -lc 'echo ''LDFLAGS=-L/mingw64/lib'' >> ~/.bash_profile'
 - git submodule update --init --recursive
 
 build_script:
 - sh: ./build.sh
 - ps: |
-    set MSYSTEM=MINGW64
-    C:\msys64\usr\bin\bash -lc 'ls /mingw64/include'
-    C:\msys64\usr\bin\bash -lc 'cc -m64 -dM -E -x c /dev/null | grep "WIN"'
-    C:\msys64\usr\bin\bash -lc "cd /c/projects/orbital; ./build.sh"
+    PowerShell -Command 'Set-ExecutionPolicy -ExecutionPolicy RemoteSigned'
+    PowerShell -File ci_msys_build.ps1 'C:\msys64'
