@@ -5,14 +5,15 @@ matrix:
     - name: "orbital-windows"
       os: windows
       install:
+        - choco install -y msys2 
         - choco install -y windowsdriverkit10
         - choco install -y windows-sdk-10.1
-        - choco install -y msys2 
         - PowerShell -Command 'Set-ExecutionPolicy -ExecutionPolicy RemoteSigned'
         - PowerShell -File ci_msys_prepare.ps1 'C:\tools\msys64'
       before_script:
         - git submodule update --init --recursive
       script:
+        - git submodule update --init --force
         - PowerShell -Command 'Set-ExecutionPolicy -ExecutionPolicy RemoteSigned'
         - PowerShell -File ci_msys_build.ps1 'C:\tools\msys64'
         - ./bin/qemu-system-ps4.exe
